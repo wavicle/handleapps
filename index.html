@@ -1,0 +1,58 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="handleapps.css">
+		<script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+		<script src="handleapps.js"></script>
+		<link rel="stylesheet" href="custom.css">
+		<script>
+		var app;
+		$(document).ready(function() {
+			app = new wavicle.handleapps.Application($("body"));
+			app.start();
+		});
+		</script>
+	</head>
+	<body>
+		<div class="happs_output" style="margin: 100px;"></div>
+		
+		<div class="happs_outer">
+			This is the header 
+			<br/><br/>
+			{{innerBody}}
+			<br/><br/>
+			This is the footer
+		</div>
+		
+		<div id="start" class="happs_state">
+			<script type="happs_entry">
+			data.msg = "Please enter your first name: ";
+			</script>
+			<label for="firstName">{{data.msg}}</label>
+			<input name="firstName">
+			<a href="#" onclick="{{visit 'askLastName'}}">Next</a>
+			
+			<script type="happs_exit">
+			return (data.firstName + '').length > 0;
+			</script>
+		</div>
+		
+		<div id="askLastName" class="happs_state">
+			<script type="happs_entry">
+			data.msg = "Please enter your last name";
+			</script>
+			
+			<label for="lastName">{{data.msg}}</label>
+			<input name="lastName">
+			<a href="#" onclick="{{visit 'tellFullName'}}">Next</a>			
+			
+			<script type="happs_exit">
+			return (data.lastName + '').length > 0;
+			</script>
+		</div>
+
+		<div id="tellFullName" class="happs_state">
+			Your full name is: {{data.firstName}} {{data.lastName}}!
+		</div>
+	</body>
+</html>
