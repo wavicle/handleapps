@@ -65,6 +65,9 @@ function Application($rootElement) {
 	}
 
 	function runState(stateName) {
+		if (!bodyTemplatesByStateName[stateName]) {
+			throw "No such state is known: " + stateName;
+		}
 		var doExitPrevious = runExitScript();
 		if (doExitPrevious) {
 			currentStateName = stateName;
@@ -112,8 +115,8 @@ function Application($rootElement) {
 		}
 	}
 	
-	function start() {
-		runState('start');
+	function start(startStateName) {
+		runState(startStateName);
 	}
 	
 	function visit(stateName) {

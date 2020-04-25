@@ -4,17 +4,15 @@
 		<script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
 		<script src="handleapps.js"></script>
-		<link rel="stylesheet" href="custom.css">
 		<script>
-		var app;
 		$(document).ready(function() {
-			app = new wavicle.handleapps.Application($("body"));
-			app.start();
+			const app = new wavicle.handleapps.Application($("body"));
+			app.start('askFirstName');
 		});
 		</script>
 	</head>
 	<body>
-		<div class="happs_output" style="margin: 100px;"></div>
+		<div class="happs_output"></div>
 		
 		<div class="happs_outer">
 			This is the header 
@@ -24,7 +22,7 @@
 			This is the footer
 		</div>
 		
-		<div id="start" class="happs_state">
+		<div id="askFirstName" class="happs_state">
 			<script type="happs_entry">
 			data.msg = "Please enter your first name: ";
 			</script>
