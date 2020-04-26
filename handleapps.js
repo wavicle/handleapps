@@ -24,11 +24,12 @@ wavicle.handleapps.Helper = {
 /** The Application class **/
 (function() {
 	
-function Application($rootElement) {
+function Application($rootElement, id) {
 	var me = this;
-	me.id = new Date().getTime() + "-" + Math.random();
+	me.id = id || (new Date().getTime() + "-" + Math.random());
 
 	var currentStateName;
+	var exposedProperties = [];
 	var outerTemplateString = $rootElement.find(".happs_outer").html();
 	var outerTemplate = outerTemplateString? Handlebars.compile(outerTemplateString): null;
 	var $outputContainer = $rootElement.find(".happs_output");
@@ -36,29 +37,16 @@ function Application($rootElement) {
 	var entryHandlersByStateName = {};
 	var exitHandlersByStateName = {};
 	var bodyTemplatesByStateName = {};
-	{
-		var $states = $rootElement.find(".happs_state");
-		$states.each(function() {
-			var $state = $(this);
-			var stateName = $state.attr('id');
-			
-			entryHandlersByStateName[stateName] = createHandlerFunction(
-				$state.find("script[type='happs_entry']").html());
-			exitHandlersByStateName[stateName] = createHandlerFunction(
-				$state.find("script[type='happs_exit'").html());
-			
-			var $body = $state.clone();
-			$body.find("script").remove();
-			var bodyTemplate = $body.html();
-			var template = bodyTemplate? Handlebars.compile(bodyTemplate): null;
-			bodyTemplatesByStateName[stateName] = template;
-		})
-	}
 	
 	function createHandlerFunction(body) {
+		var exposeScript = '';
+		for(var i in exposedProperties) {
+			const exposedProperty = exposedProperties[i];
+			exposeScript += `const ${exposedProperty} = this['${exposedProperty}'];`;
+		}
 		if(body) {
 			return new Function(`
-			var data = this.data;
+			${exposeScript}
 			${body}
 			`);
 		}
@@ -116,6 +104,22 @@ function Application($rootElement) {
 	}
 	
 	function start(startStateName) {
+		var $states = $rootElement.find(".happs_state");
+		$states.each(function() {
+			var $state = $(this);
+			var stateName = $state.attr('id');
+			
+			entryHandlersByStateName[stateName] = createHandlerFunction(
+				$state.find("script[type='happs_entry']").html());
+			exitHandlersByStateName[stateName] = createHandlerFunction(
+				$state.find("script[type='happs_exit'").html());
+			
+			var $body = $state.clone();
+			$body.find("script").remove();
+			var bodyTemplate = $body.html();
+			var template = bodyTemplate? Handlebars.compile(bodyTemplate): null;
+			bodyTemplatesByStateName[stateName] = template;
+		})
 		runState(startStateName);
 	}
 	
@@ -127,6 +131,9 @@ function Application($rootElement) {
 	this.data = {};
 	this.start = start;
 	this.visit = visit;
+	this.expose = function(properties) {
+		exposedProperties = properties || [];
+	};
 	this.getId = function() {
 		return id;
 	};
